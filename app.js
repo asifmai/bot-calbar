@@ -10,7 +10,7 @@ let browser;
 const run = async () => {
   try {
     console.log('Stated Scraping...');
-    browser = await pupHelper.launchBrowser();
+    browser = await pupHelper.launchBrowser(false, SOCKS_HOST, SOCKS_PORT);
 
     const promises = [];
     const limit = pLimit(concurrency);
@@ -38,6 +38,11 @@ const fetch = (attorneyNumber) => new Promise(async (resolve, reject) => {
     const result = {};
     const pageUrl = siteLink + pad(attorneyNumber, 6);
     page = await pupHelper.launchPage(browser);
+
+    if (SOCKS_USER !== '' && SOCKS_PASSWORD !== '') {
+      await page.authenticate({username: SOCKS_USER, password: SOCKS_PASSWORD});
+    }
+    
     await page.goto(pageUrl, {timeout: 0, waitUntil: 'load'});
     await page.waitForSelector('#moduleMemberDetail > div:nth-of-type(2) > p');
 
